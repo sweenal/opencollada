@@ -30,8 +30,7 @@ HINSTANCE hInstance;
 int controlsInit = FALSE;
 
 static const COLLADAMax::String LIBDESCRIPTION = "COLLADAMax NextGen" + 
-		(COLLADAMax::COLLADAPlugin::PLUGIN_VERSION_STRING.empty() ? "" : (COLLADAMax::String(" ") + COLLADAMax::COLLADAPlugin::PLUGIN_VERSION_STRING))+
-		(COLLADAMax::COLLADAPlugin::REVISION_STRING.empty() ? "" : (COLLADAMax::String(" ") + COLLADAMax::COLLADAPlugin::REVISION_STRING));
+      (COLLADAMax::COLLADAPlugin::REVISION_STRING.empty() ? "" : (COLLADAMax::String(" ") + COLLADAMax::COLLADAPlugin::REVISION_STRING));
 
 BOOL WINAPI DllMain ( HINSTANCE hinstDLL, ULONG fdwReason, LPVOID UNUSED ( lpvReserved ) )
 {

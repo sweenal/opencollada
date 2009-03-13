@@ -43,7 +43,6 @@ namespace COLLADAMax
     const String DocumentExporter::SCENE_ID = "MaxScene";
 
 	const String DocumentExporter::AUTHORING_TOOL = String("COLLADAMax NextGen") + 
-		(COLLADAPlugin::PLUGIN_VERSION_STRING.empty() ? "" : String(";  ") + COLLADAPlugin::PLUGIN_VERSION_STRING) +
 		(COLLADAPlugin::REVISION_STRING.empty() ? "" : String(";  ") + COLLADAPlugin::REVISION_STRING) +
 		String(";  ") + COLLADAPlugin::PLATFORM_STRING + 
 		String(";  ") + COLLADAPlugin::CONFIGURATION_STRING;

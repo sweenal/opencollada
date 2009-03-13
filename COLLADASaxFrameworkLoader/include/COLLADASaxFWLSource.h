@@ -164,10 +164,7 @@ namespace COLLADASaxFWL
         Source () : SourceBase () {}
 
         /** Destructor. */
-        virtual ~Source () 
-		{
-			int gg = 0;
-		}
+        virtual ~Source () {}
 
 		/**
 		* The value type of the current values. All other arrays are empty!

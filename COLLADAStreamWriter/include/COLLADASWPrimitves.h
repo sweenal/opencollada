@@ -208,6 +208,8 @@ namespace COLLADASW
          */
         void finish();
 
+    protected:
+
         /** 
          * Prepares to fill the <p> element. This member must be called exactly 
          * once before add is called the first time.
@@ -325,8 +327,6 @@ namespace COLLADASW
 
 
     typedef Primitive<CSWC::CSW_ELEMENT_TRIANGLES> Triangles;
-	typedef Primitive<CSWC::CSW_ELEMENT_TRIFANS> Trifans;
-	typedef Primitive<CSWC::CSW_ELEMENT_TRISTRIPS> Tristrips;
     typedef Primitive<CSWC::CSW_ELEMENT_POLYLIST> Polylist;
 
 } //namespace COLLADASW

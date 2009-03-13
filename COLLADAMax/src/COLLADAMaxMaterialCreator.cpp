@@ -18,8 +18,6 @@ http://www.opensource.org/licenses/mit-license.php
 #include "COLLADAMaxStableHeaders.h"
 #include "COLLADAMaxMaterialCreator.h"
 
-#include "COLLADAMaxConversionFunctor.h"
-
 #include "COLLADAMaxMultiMtl.h"
 
 #include <max.h>
@@ -377,15 +375,15 @@ namespace COLLADAMax
 			material->SetSelfIllum( 0, 0 );
 		}
 
-		float maxOpacity = 1;
-		const COLLADAFW::ColorOrTexture& opacity = effectCommon.getOpacity();
-		if ( opacity.isColor() )
+		float opacity = 1;
+		const COLLADAFW::ColorOrTexture& opacityColorOrTexture = effectCommon.getOpacity();
+		if ( opacityColorOrTexture.isColor() )
 		{
-			const COLLADAFW::Color& opacityColor = opacity.getColor(); 
+			const COLLADAFW::Color& opacityColor = opacityColorOrTexture.getColor(); 
 			float averageTransparent = (float)(opacityColor.getRed() + opacityColor.getGreen() + opacityColor.getBlue())/3; 
-			maxOpacity = averageTransparent;
+			opacity = averageTransparent;
 		}
-		material->SetOpacity( maxOpacity, 0);
+		material->SetOpacity( opacity, 0);
 
 		if (shaderType != COLLADAFW::EffectCommon::SHADER_CONSTANT && shaderType != COLLADAFW::EffectCommon::SHADER_UNKNOWN)
 		{
@@ -407,17 +405,6 @@ namespace COLLADAMax
 				material->SetSpecular( toMaxColor(diffuse), 0 );
 		}
 
-		const COLLADAFW::ColorOrTexture& specular = effectCommon.getSpecular();
-		float shininess = (float)effectCommon.getShininess();
-		if ( shaderType == COLLADAFW::EffectCommon::SHADER_PHONG || shaderType == COLLADAFW::EffectCommon::SHADER_BLINN)
-		{
-			// Phong material parameters
-			if ( specular.isColor() )
-				material->SetSpecular( toMaxColor(specular), 0 );
-
-			material->SetShininess(ConversionFunctors::fromPercent(shininess), 0);
-			material->SetShinStr(ConversionFunctors::fromPercent(shininess), 0);
-		}
 
 		//create and assign textures
 		createAndAssignTexture( material, effectCommon, &COLLADAFW::EffectCommon::getAmbient, ID_AM, materialIdentifier.ambientMapChannel);
@@ -464,14 +451,6 @@ namespace COLLADAMax
 		COLLADABU::NativeString imageFileName( imageUri.toNativePath().c_str(), COLLADABU::NativeString::ENCODING_UTF8 );
 		bitmapTexture->SetMapName(const_cast<char*>(imageFileName.c_str()));
 		bitmapTexture->LoadMapFiles(0);
-
-		UVGen* uvGen = bitmapTexture->GetTheUVGen();
-		StdUVGen* stdUVGen = (StdUVGen*)uvGen;
-
-		// reset all flags
-		stdUVGen->SetFlag(U_WRAP|V_WRAP, 1);
-		stdUVGen->SetFlag(U_MIRROR|V_MIRROR, 0);
-
 
 		return bitmapTexture;
 	}

@@ -92,6 +92,11 @@ namespace COLLADASaxFWL
 				colorOrTexture->setType(COLLADAFW::ColorOrTexture::COLOR);
 				handleColorData(data, length, colorOrTexture->getColor());
 
+                if ( mCurrentShaderParameterType == SHADER_PARAMETER_TRANSPARENT )
+                {
+                    mTransparent.getColor ().set ( -1, -1, -1, -1 );
+                }
+
 				break;
 			}
 
@@ -203,6 +208,9 @@ namespace COLLADASaxFWL
 	//------------------------------
 	bool LibraryEffectsLoader::end__effect()
 	{
+        // Calculate the opacity value.
+        calculateOpacity ();
+
 		bool success = writer()->writeEffect(mCurrentEffect);
 		FW_DELETE mCurrentEffect;
 		mCurrentEffect = 0;
@@ -220,11 +228,6 @@ namespace COLLADASaxFWL
 	//------------------------------
 	bool LibraryEffectsLoader::end__profile_COMMON()
 	{
-		// Calculate the opacity value.
-		calculateOpacity ();
-
-		mTransparent.getColor ().set ( -1, -1, -1, -1 );
-
 		mCurrentProfile = PROFILE_UNKNOWN;
 		return true;
 	}
