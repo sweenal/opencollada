@@ -46,7 +46,7 @@ namespace COLLADAFW
 			OWNER = RELEASE_MEMORY | KEEP_OWNERSHIP_ON_ASSIGNEMNT
 		};
 
-	private:
+	protected:
 
 		/** The data C-array. */
 		Type* mData;
@@ -87,13 +87,13 @@ namespace COLLADAFW
         {}
 
         /** Destructor. */
-        ~Array ()
+        virtual ~Array ()
         {
 			clear();
 		}
 
 		/** Clears the array, i.e. releasese memory if nescesary and reset all members.*/
-		void clear()
+		virtual void clear()
 		{
 			if ( mFlags & RELEASE_MEMORY)
 				releaseMemory();
@@ -147,7 +147,7 @@ namespace COLLADAFW
 
 		/** Releases the memory that has been allocated by allocateMemory().
         Must not be called, if the memory has not been allocated by allocateMemory().*/
-		virtual void releaseMemory ()
+		void releaseMemory ()
         {
             delete[] mData;
             setData ( 0, 0, 0 );

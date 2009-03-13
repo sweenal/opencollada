@@ -54,7 +54,6 @@ namespace COLLADASaxFWL
                     InputShared* input = new InputShared ( inputUnshared->getSemantic (), inputUnshared->getSource (), inputShared->getOffset (), inputShared->getSet() );
                     mInputArray.append ( input );
                 }
-				delete inputShared; // we are responsible for inputShared
                 return mInputArray [ mInputArray.getCount () - 1 ];
             }
             else
