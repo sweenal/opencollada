@@ -1,0 +1,25 @@
+-   General
+    -   Linux
+    -   Internationalisation (i18n)
+    -   Reader (importer)
+
+-   VisualSceneExport
+    -   Reference to the effect texture
+	    
+-   EffectsExport
+    -   hlsl shader
+
+-   AnimationsExport
+    -   Path animation
+    -   Constraints (point, orient, parent)
+
+-   PhysicalSceneExport
+    -   Constraints (point, orient, parent)
+
+-   Subdivision surfaces export
+-   Nurbs export
+-   Splines export
+-   External references export (XREFs):
+    -   write mutiple dae documents
+
+
