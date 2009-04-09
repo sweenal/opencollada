@@ -1,0 +1,116 @@
+/*
+    Copyright (c) 2008 NetAllied Systems GmbH
+
+    This file is part of COLLADASaxFrameworkLoader.
+
+    Licensed under the MIT Open Source License, 
+    for details please see LICENSE file or the website
+    http://www.opensource.org/licenses/mit-license.php
+*/
+
+#include "COLLADASaxFWLStableHeaders.h"
+#include "COLLADASaxFWLLibraryImagesLoader.h"
+
+#include "COLLADAFWImage.h"
+#include "COLLADAFWIWriter.h"
+
+
+namespace COLLADASaxFWL
+{
+
+    //------------------------------
+	LibraryImagesLoader::LibraryImagesLoader( IFilePartLoader* callingFilePartLoader )
+		: FilePartLoader(callingFilePartLoader)
+		, mCurrentImage(0)
+	{
+
+	}
+
+    //------------------------------
+	LibraryImagesLoader::~LibraryImagesLoader()
+	{
+	}
+
+	//------------------------------
+	bool LibraryImagesLoader::end__library_images()
+	{
+		SaxVirtualFunctionTest(end__library_images()); 
+		finish();
+		return true;
+	}
+
+	//------------------------------
+	bool LibraryImagesLoader::begin__image( const image__AttributeData& attributeData )
+	{
+		SaxVirtualFunctionTest(begin__image(attributeData)); 
+		mCurrentImage = FW_NEW COLLADAFW::Image( getUniqueIdFromId( attributeData.id, COLLADAFW::Image::ID()).getObjectId() );
+
+		if ( attributeData.name )
+			mCurrentImage->setName( (const char*) attributeData.name );
+		else if ( attributeData.id )
+			mCurrentImage->setName( (const char*) attributeData.id );
+
+		if ( attributeData.format )
+			mCurrentImage->setFormat( attributeData.format );
+		
+		mCurrentImage->setHeight( (unsigned long)attributeData.height );
+		mCurrentImage->setWidth( (unsigned long)attributeData.width );
+		mCurrentImage->setDepth( (unsigned long)attributeData.depth );
+
+		return true;
+	}
+
+	//------------------------------
+	bool LibraryImagesLoader::end__image()
+	{
+		SaxVirtualFunctionTest(end__image()); 
+		bool success = writer()->writeImage(mCurrentImage);
+		FW_DELETE mCurrentImage;
+		return success;
+	}
+
+	//------------------------------
+	bool LibraryImagesLoader::begin__init_from____anyURI()
+	{
+		SaxVirtualFunctionTest(begin__init_from____anyURI()); 
+		mCurrentImage->setSourceType( COLLADAFW::Image::SOURCE_TYPE_URI );
+		return true;
+	}
+
+	//------------------------------
+	bool LibraryImagesLoader::end__init_from____anyURI()
+	{
+		SaxVirtualFunctionTest(end__init_from____anyURI()); 
+		// we don't need to do anything here
+		return true;
+	}
+
+	//------------------------------
+	bool LibraryImagesLoader::data__init_from____anyURI( COLLADABU::URI value )
+	{
+		SaxVirtualFunctionTest(data__init_from____anyURI(value)); 
+		mCurrentImage->setImageURI( value );
+		return true;
+	}
+
+	//------------------------------
+	bool LibraryImagesLoader::begin__data()
+	{
+		SaxVirtualFunctionTest(begin__data()); 
+		// disabled see COLALDAFW::Image
+		//mCurrentImage->setSourceType( COLLADAFW::Image::SOURCE_TYPE_DATA);
+		return true;
+	}
+
+	//------------------------------
+	bool LibraryImagesLoader::data__data( const uint8* data, size_t length )
+	{
+		SaxVirtualFunctionTest(data__data(data, length)); 
+		// disabled see COLALDAFW::Image
+		//COLLADAFW::Image::CharacterArray& dataArray = mCurrentImage->getData();
+		//dataArray.appendValues( (char *)data, length );
+		return true;
+	}
+
+
+} // namespace COLLADASaxFWL
