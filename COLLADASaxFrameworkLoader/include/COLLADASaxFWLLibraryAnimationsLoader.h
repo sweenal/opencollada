@@ -13,9 +13,7 @@
 
 #include "COLLADASaxFWLPrerequisites.h"
 #include "COLLADASaxFWLSourceArrayLoader.h"
-
 #include "COLLADAFWAnimationCurve.h"
-#include "COLLADAFWAnimationList.h"
 
 
 namespace COLLADASaxFWL
@@ -27,24 +25,17 @@ namespace COLLADASaxFWL
 	private:
 
 		/** Maps strings to unique ids.*/
-		typedef std::map< String /*samplerId*/,AnimationInfo > StringAnimationInfoMap;
+		typedef std::map< String /*samplerId*/, COLLADAFW::UniqueId /* animation*/ > StringUniqueIdMap;
 
 	private:
-
-        /** Pretty-print name for this animation. Optional. */
-        String mName; 
-
-        /** The animation curve currently being filled. Is none null only inside a sampler element.*/
+		/** The animation curve currently being filled. Is none null only inside a sampler element.*/
 		COLLADAFW::AnimationCurve* mCurrentAnimationCurve;
 
 		/** Maps the id of sampler to the unique id of the frame work animation created for this sampler.*/
-		StringAnimationInfoMap mSamplerIdAnimationInfoMap;
+		StringUniqueIdMap mSamplerIdAnimationUniqueIdMap;
 	
 		/** True, if the array currently parsed is an IDREF_array, supposed to contain the interpolation data.*/
 		bool mCurrentlyParsingInterpolationArray;
-
-		/** The animation info of the currently being parsed sampler.*/
-		AnimationInfo* mCurrentAnimationInfo;
 
 	public:
 		/** Determines the interpolation with @a name.*/
@@ -58,9 +49,9 @@ namespace COLLADASaxFWL
         /** Destructor. */
 		virtual ~LibraryAnimationsLoader();
 
-		/** Searches for the animation info of animation created for the COLLADA sampler with id @a samplerId.
+		/** Searches for the unique id of animation created for the COLLADA sampler with id @a samplerId.
 		If it could not be found, an invalid Unique id is returned.*/
-		AnimationInfo* getAnimationInfoBySamplerId( const String& samplerId);
+		const COLLADAFW::UniqueId& getAnimationBySamplerId( const String& samplerId);
 
 
 		/** Cleans up everything and gives control to calling file part loader.*/
@@ -101,12 +92,6 @@ namespace COLLADASaxFWL
 
 
 	private:
-
-        /** Pretty-print name for this animation. Optional. */
-        const COLLADAFW::String& getName () const { return mName; }
-
-        /** Pretty-print name for this animation. Optional. */
-        void setName ( const COLLADAFW::String& val ) { mName = val; }
 
         /** Disable default copy ctor. */
 		LibraryAnimationsLoader( const LibraryAnimationsLoader& pre );

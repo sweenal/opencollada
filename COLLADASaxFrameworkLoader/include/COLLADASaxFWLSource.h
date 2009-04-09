@@ -48,26 +48,6 @@ namespace COLLADASaxFWL
 			DATA_TYPE_UNKNOWN
 		};
 
-		/** Describes one parameter in a COLLADA accessor.*/
-		struct AccessorParameter
-		{
-			String name;
-			String type;
-
-			bool operator==( const SourceBase::AccessorParameter& rhs) const
-			{
-				return ( name == rhs.name) && ( type == rhs.type );
-			}
-
-			bool operator!=( const SourceBase::AccessorParameter& rhs) const
-			{
-				return ( name != rhs.name) || ( type != rhs.type );
-			}
-
-		};
-
-		/** List of all parameters of an accessor, defining the meaning of the values in an array.*/
-		typedef std::vector< AccessorParameter > Accessor;
     private:
 
         /** 
@@ -92,9 +72,6 @@ namespace COLLADASaxFWL
          * referenced in the current mesh. 
          */
         size_t mInitialIndex;
-
-		/** The accessor of the source.*/
-		Accessor mAccessor;
 
     public:
 
@@ -165,16 +142,7 @@ namespace COLLADASaxFWL
         */
         void setInitialIndex ( size_t InitialIndex ) { mInitialIndex = InitialIndex; }
 
-		/** Appends an accessor parameter to the source's  accessor.*/
-		void appandAccessorParameter( const AccessorParameter& parameter ) { mAccessor.push_back( parameter ); }
-
-		/** Returns the accessor.*/
-		const Accessor& getAccessor() const { return mAccessor; }
-
     };
-
-
-
 
     /** 
      * Declares a data repository that provides values according to the 

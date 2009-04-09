@@ -77,7 +77,7 @@ global proc int colladaNextGenImporterOpts ( string $parent,
 					checkBoxGrp
 							-l " "
 							-ncb 1
-							-v1 true
+							-v1 false
 							-l1 "Normals"
 							colladaImportNormals;
 

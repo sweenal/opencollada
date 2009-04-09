@@ -416,10 +416,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\COLLADASaxFWLTypes.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\src\COLLADASaxFWLVisualSceneLoader.cpp"
 				>
 			</File>
@@ -595,10 +591,6 @@
 			</File>
 			<File
 				RelativePath="..\include\COLLADASaxFWLTechniqueCommon.h"
-				>
-			</File>
-			<File
-				RelativePath="..\include\COLLADASaxFWLTypes.h"
 				>
 			</File>
 			<File

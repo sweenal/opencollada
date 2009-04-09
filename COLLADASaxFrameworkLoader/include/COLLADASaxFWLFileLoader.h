@@ -13,13 +13,11 @@
 
 #include "COLLADASaxFWLPrerequisites.h"
 
-#include "COLLADASaxFWLTypes.h"
-#include "COLLADASaxFWLIFilePartLoader.h"
-#include "COLLADASaxFWLColladaParserAutoGenPrivate.h"
-#include "COLLADASaxFWLSidAddress.h"
-
 #include "GeneratedSaxParserLibxmlSaxParser.h"
 #include "GeneratedSaxParserRawUnknownElementHandler.h"
+
+#include "COLLADASaxFWLIFilePartLoader.h"
+#include "COLLADASaxFWLColladaParserAutoGenPrivate.h"
 
 #include "COLLADAFWUniqueId.h"
 
@@ -54,18 +52,11 @@ namespace COLLADASaxFWL
 		/** Maps the id of a collada element to the corresponding sit tree node.*/
 		typedef std::map<String /*id*/, SidTreeNode*> IdStringSidTreeNodeMap;
 
-		/** Contains the binding of an animation to the referenced object. Required to create animation lists*/
-		struct AnimationSidAddressBinding
-		{
-			AnimationSidAddressBinding( const AnimationInfo& _animationInfo, const SidAddress& _sidAddress)
-				: animationInfo(_animationInfo), sidAddress(_sidAddress) {}
-			AnimationInfo animationInfo;
-
-			SidAddress sidAddress;
-		};
+		/** Pairs the Unique id of an animation and the sid of the animation target.*/
+		typedef std::pair<COLLADAFW::UniqueId, SidAddress> UniqueIdSidAddressPair;
 
 		/** List of UniqueIdSidAddressPairs.*/
-		typedef std::vector< AnimationSidAddressBinding > AnimationSidAddressBindingList;
+		typedef std::vector< UniqueIdSidAddressPair > UniqueIdSidAddressPairList;
 
 		/** Maps unique ids of animation list to the corresponding animation list.*/
 		typedef std::map< COLLADAFW::UniqueId , COLLADAFW::AnimationList* > UniqueIdAnimationListMap;
@@ -100,7 +91,7 @@ namespace COLLADASaxFWL
 		VisualSceneList mVisualScenes;
 
 		/** List all the connections of animations and sid addresses of the targets.*/
-		AnimationSidAddressBindingList mAnimationSidAddressBindings;
+		UniqueIdSidAddressPairList mAnimationUniqueIdSidAddressPairs;
 
 		/** Maps unique ids of animation list to the corresponding animation list. All animation list in this map 
 		will be deleted by the FileLoader.*/
@@ -178,7 +169,7 @@ namespace COLLADASaxFWL
 		const COLLADABU::URI& getFileUri();
 
 		/** The pair @a animationUniqueId, @a targetSidAddress to mUniqueIdSidAddressPairs.*/
-		void addToAnimationSidAddressBindings( const AnimationInfo& animationInfo, const SidAddress& targetSidAddress );
+		void addToAnimationUniqueIdSidAddressPairList( const COLLADAFW::UniqueId& animationUniqueId, const SidAddress& targetSidAddress);
 
 		/** Returns the animation list with Unique id @a animationListUniqueId. If it could not be found, a new map 
 		entry is created.*/
@@ -186,13 +177,6 @@ namespace COLLADASaxFWL
 
 		/** Writes all the visual scenes.*/
 		void writeAndDeleteVisualScenes();
-
-		/** Creates all the animation lists.*/
-		void FileLoader::createMissingAnimationLists();
-
-		/** Stores the binding stored in @a binding in the appropriate animation list*/
-		void FileLoader::createMissingAnimationList( const AnimationSidAddressBinding& binding );
-
 
 		/** Writes all animation lists.*/
 		void writeAndDeleteAnimationLists();
@@ -244,6 +228,8 @@ namespace COLLADASaxFWL
 
         /** Disable default assignment operator. */
 		const FileLoader& operator= ( const FileLoader& pre );
+
+
 	};
 	
 } // namespace COLLADASaxFWL

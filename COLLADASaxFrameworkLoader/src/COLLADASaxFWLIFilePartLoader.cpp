@@ -151,9 +151,9 @@ namespace COLLADASaxFWL
 	}
 
 	//------------------------------
-	void IFilePartLoader::addToAnimationSidAddressBindings( const AnimationInfo& animationInfo, const SidAddress& targetSidAddress )
+	void IFilePartLoader::addToAnimationUniqueIdSidAddressPairList( const COLLADAFW::UniqueId& animationUniqueId, const SidAddress& targetSidAddress )
 	{
-		getFileLoader()->addToAnimationSidAddressBindings( animationInfo, targetSidAddress );
+		getFileLoader()->addToAnimationUniqueIdSidAddressPairList( animationUniqueId, targetSidAddress );
 	}
 
 	//------------------------------

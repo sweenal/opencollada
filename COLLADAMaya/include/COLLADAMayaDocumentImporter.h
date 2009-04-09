@@ -50,12 +50,7 @@ namespace COLLADAMaya
         static const String ASCII_PATH_EXTENSION;
         static const String ASCII_PATH_EXTENSION_DEBUG;
 
-        static const int BUFFERSIZE;
-
     private:
-
-        /** The buffer for fprintf. */
-        char *mBuffer; // 2MB Puffer!!
 
         /** The name of the collada file. */
         String mColladaFileName;
@@ -83,7 +78,6 @@ namespace COLLADAMaya
         bool mAssetWritten;
         bool mSceneGraphWritten;
         bool mLibraryNodesWritten;
-        bool mAnimationWritten;
 
         bool mSceneGraphRead;
         bool mLibraryNodesRead;
@@ -91,8 +85,6 @@ namespace COLLADAMaya
         bool mCameraRead;
         bool mLightRead;
         bool mImageRead;
-        bool mAnimationRead;
-        bool mAnimationListRead;
 
         /** Pointer to the visual scene importer. */
         VisualSceneImporter* mVisualSceneImporter;

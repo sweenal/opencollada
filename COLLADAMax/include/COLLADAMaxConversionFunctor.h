@@ -74,7 +74,6 @@ namespace COLLADAMax
 	{
 	public:
 		static ScaleConversionFunctor radToDeg;
-		static ScaleConversionFunctor degToRad;
 		static ScaleConversionFunctor fromPercent;
 		static ScaleConversionFunctor toPercent;
 

@@ -17,7 +17,6 @@
 #include "COLLADAFWValidate.h"
 #include "COLLADAFWAnimationList.h"
 #include "COLLADAFWIWriter.h"
-#include "COLLADAFWTypes.h"
 
 
 namespace COLLADASaxFWL
@@ -41,7 +40,6 @@ namespace COLLADASaxFWL
 	const String INTERPOLATIONTYPE_STEP("STEP");
 	const String INTERPOLATIONTYPE_MIXED("MIXED");
 
-
 	//------------------------------
 	bool operator==( const ParserString& parserString, const String& stlSring )
 	{
@@ -58,144 +56,6 @@ namespace COLLADASaxFWL
 		}
 		return true;
 	}
-
-	struct AccessorAnimationClassPair
-	{
-		AccessorAnimationClassPair( const SourceBase::AccessorParameter* _parameters,
-									size_t _parameterCount,
-			                        COLLADAFW::AnimationList::AnimationClass _animationClass)
-									: parameters(_parameters)
-									, parameterCount(_parameterCount/sizeof(SourceBase::AccessorParameter))
-									, animationClass(_animationClass)
-		{}
-		const SourceBase::AccessorParameter* parameters;
-		size_t parameterCount;
-		COLLADAFW::AnimationList::AnimationClass animationClass;
-	};
-
-	struct AccessorDimensionsPair
-	{
-		AccessorDimensionsPair( const SourceBase::AccessorParameter& _parameter,
-								COLLADAFW::PhysicalDimension _physicalDimension,
-								size_t _dimension)
-			: parameter(_parameter)
-			, physicalDimension(_physicalDimension)
-			, dimension(_dimension)
-		{}
-		const SourceBase::AccessorParameter& parameter;
-		COLLADAFW::PhysicalDimension physicalDimension;
-		size_t dimension;
-	};
-
-	SourceBase::AccessorParameter parameterTime = {"TIME", "float"};
-	SourceBase::AccessorParameter parameterFloat = {"", "float"};
-	SourceBase::AccessorParameter parameterX = {"X", "float"};
-	SourceBase::AccessorParameter parameterY = {"Y", "float"};
-	SourceBase::AccessorParameter parameterZ = {"Z", "float"};
-	SourceBase::AccessorParameter parameterAngle = {"ANGLE", "float"};
-	SourceBase::AccessorParameter parameterTransform = {"TRANSFORM", "float4x4"};
-
-	SourceBase::AccessorParameter accessorTime[] = {parameterTime};
-	SourceBase::AccessorParameter accessorFloat[] = {parameterFloat};
-	SourceBase::AccessorParameter accessorX[] = {parameterX};
-	SourceBase::AccessorParameter accessorY[] = {parameterY};
-	SourceBase::AccessorParameter accessorZ[] = {parameterZ};
-	SourceBase::AccessorParameter accessorAngle[] = {parameterAngle};
-	SourceBase::AccessorParameter accessorTransform[] = {parameterTransform};
-
-	SourceBase::AccessorParameter accessorXYZ[] = {parameterX, parameterY, parameterZ};
-	SourceBase::AccessorParameter accessorAxisAngle[] = {parameterX, parameterY, parameterZ, parameterAngle};
-
-	AccessorAnimationClassPair animationClassMap[] = 
-	{ 
-		  AccessorAnimationClassPair( accessorTime, sizeof(accessorTime), COLLADAFW::AnimationList::TIME)
-		, AccessorAnimationClassPair( accessorFloat, sizeof(accessorFloat), COLLADAFW::AnimationList::FLOAT)
-		, AccessorAnimationClassPair( accessorX, sizeof(accessorX), COLLADAFW::AnimationList::POSITION_X)
-		, AccessorAnimationClassPair( accessorY, sizeof(accessorY), COLLADAFW::AnimationList::POSITION_Y)
-		, AccessorAnimationClassPair( accessorZ, sizeof(accessorZ), COLLADAFW::AnimationList::POSITION_Z)
-		, AccessorAnimationClassPair( accessorAngle, sizeof(accessorAngle), COLLADAFW::AnimationList::ANGLE)
-		, AccessorAnimationClassPair( accessorXYZ, sizeof(accessorXYZ), COLLADAFW::AnimationList::POSITION_XYZ)
-		, AccessorAnimationClassPair( accessorAxisAngle, sizeof(accessorAxisAngle), COLLADAFW::AnimationList::AXISANGLE)
-		, AccessorAnimationClassPair( accessorTransform, sizeof(accessorTransform), COLLADAFW::AnimationList::MATRIX4X4)
-	};
-
-#if 0
-	AccessorDimensionsPair animationDimensionMap[] = 
-	{ 
-	      AccessorDimensionsPair( parameterFloat, PHYSICAL_DIMENSION_UNKNOWN, 1)
-    	, AccessorDimensionsPair( parameterX, PHYSICAL_DIMENSION_LENGTH, 1)
-		, AccessorDimensionsPair( parameterY, PHYSICAL_DIMENSION_LENGTH, 1)
-		, AccessorDimensionsPair( parameterZ, PHYSICAL_DIMENSION_LENGTH, 1)
-		, AccessorDimensionsPair( parameterAngle, PHYSICAL_DIMENSION_ANGLE, 1)
-		, AccessorDimensionsPair( parameterTransform, PHYSICAL_DIMENSION_TRANSFORMATIONMATRIX4X4, 16)
-	};
-#endif
-
-
-	/** Determines the animation class from the accessor.*/
-	//------------------------------
-	COLLADAFW::AnimationList::AnimationClass determineAnimationClass( const SourceBase::Accessor& accessor )
-	{
-		static const size_t mapSize = sizeof(animationClassMap)/sizeof(AccessorAnimationClassPair);
-		for ( size_t i = 0; i < mapSize; ++i)
-		{
-			const AccessorAnimationClassPair& animationClassPair = animationClassMap[i];
-
-			if ( accessor.size() != animationClassPair.parameterCount )
-			{
-				// to accessor must have equal number of parameters to be equal
-				continue;
-			}
-
-			bool equal = true;
-			for ( size_t j = 0; j < animationClassPair.parameterCount; ++j)
-			{
-				const SourceBase::AccessorParameter& parameter = animationClassPair.parameters[j];
-				const SourceBase::AccessorParameter& accessorParameter = accessor[j];
-				if ( parameter !=  accessorParameter ) 
-				{
-					equal = false;
-					break;
-				}
-			}
-
-			if ( equal )
-			{
-				// if we reach this point, the parameters in accessor are equal to those in animationClassPair
-				return animationClassPair.animationClass;
-			}
-		}
-
-		return COLLADAFW::AnimationList::UNKNOWN_CLASS;
-	}
-
-#if 0
-	/** Determines the physical dimension and the dimension of @a parameter.
-	@param parameters the accessor parameter to determine the dimensions from
-	@param physicalDimension Will be set to the physical dimension
-	@param dimension Will be set to the dimension of the parameter, e.g. 1 for float, 16 for float4x4 
-	@return True if parameter was found, false otherwise.*/
-	//------------------------------
-	bool determineParameterDimensions( const SourceBase::AccessorParameter& parameter,
-									   COLLADAFW::PhysicalDimension& physicalDimension,
-									   size_t& dimension)
-	{
-		static const size_t mapSize = sizeof(animationDimensionMap)/sizeof(AccessorDimensionsPair);
-		for ( size_t i = 0; i < mapSize; ++i)
-		{
-			const AccessorDimensionsPair& animationDimensionPair = animationDimensionMap[i];
-
-			if ( parameter ==  animationDimensionPair.parameter ) 
-			{
-				physicalDimension = animationDimensionPair.physicalDimension;
-				dimension = animationDimensionPair.dimension;
-				return true;
-			}
-		}
-
-		return false;
-	}
-#endif
 
 	//------------------------------
 	COLLADAFW::AnimationCurve::InterpolationType LibraryAnimationsLoader::getInterpolationTypeByString( const ParserString& string )
@@ -263,7 +123,6 @@ namespace COLLADASaxFWL
 		: SourceArrayLoader(callingFilePartLoader)
 		, mCurrentAnimationCurve(0)
 		, mCurrentlyParsingInterpolationArray(false)
-		, mCurrentAnimationInfo( 0 )
 	{}
 
     //------------------------------
@@ -286,16 +145,16 @@ namespace COLLADASaxFWL
 	}
 
 	//------------------------------
-	AnimationInfo* LibraryAnimationsLoader::getAnimationInfoBySamplerId( const String& samplerId )
+	const COLLADAFW::UniqueId& LibraryAnimationsLoader::getAnimationBySamplerId( const String& samplerId )
 	{
-		StringAnimationInfoMap::iterator it = mSamplerIdAnimationInfoMap.find( samplerId );
-		if ( it == mSamplerIdAnimationInfoMap.end() )
+		StringUniqueIdMap::const_iterator it = mSamplerIdAnimationUniqueIdMap.find( samplerId );
+		if ( it == mSamplerIdAnimationUniqueIdMap.end() )
 		{
-			return 0;
+			return COLLADAFW::UniqueId::INVALID;
 		}
 		else
 		{
-			return &(it->second);
+			return it->second;
 		}
 	}
 
@@ -328,11 +187,6 @@ namespace COLLADASaxFWL
 	bool LibraryAnimationsLoader::begin__animation( const animation__AttributeData& attributeData )
 	{
 		SaxVirtualFunctionTest(begin__animation(attributeData));
-
-        if ( attributeData.name ) mName = (const char*)attributeData.name;
-        else if ( attributeData.id) mName = (const char*)attributeData.id;
-        else mName = "";
-
 		return true;
 	}
 
@@ -348,14 +202,10 @@ namespace COLLADASaxFWL
 	{
 		SaxVirtualFunctionTest(begin__sampler(attributeData));
 		mCurrentAnimationCurve = FW_NEW COLLADAFW::AnimationCurve(getUniqueIdFromId(attributeData.id, COLLADAFW::Animation::ID()).getObjectId());
-		mCurrentAnimationCurve->setName ( mName );
-
+		
 		if ( attributeData.id && *attributeData.id )
 		{
-			AnimationInfo animationInfo;
-			animationInfo.uniqueId = mCurrentAnimationCurve->getUniqueId();
-			animationInfo.animationClass = COLLADAFW::AnimationList::UNKNOWN_CLASS;
-			mCurrentAnimationInfo = &(mSamplerIdAnimationInfoMap.insert(std::make_pair(attributeData.id, animationInfo)).first->second);
+			mSamplerIdAnimationUniqueIdMap[ attributeData.id ] = mCurrentAnimationCurve->getUniqueId();
 		}
 		return true;
 	}
@@ -368,14 +218,12 @@ namespace COLLADASaxFWL
 		if ( COLLADAFW::validate( mCurrentAnimationCurve ) )
 		{
 			success = writer()->writeAnimation(mCurrentAnimationCurve);
-			FW_DELETE mCurrentAnimationCurve;
 		}
 		else
 		{
 			// todo handle error
 		}
 		mCurrentAnimationCurve = 0;
-		mCurrentAnimationInfo = 0;
 		return success;
 	}
 
@@ -385,13 +233,12 @@ namespace COLLADASaxFWL
 		SaxVirtualFunctionTest(begin__channel(attributeData));
 		String samplerId = getIdFromURIFragmentType(attributeData.source);
 
-		AnimationInfo* animationInfo = getAnimationInfoBySamplerId( samplerId );
+		const COLLADAFW::UniqueId& animationUniqueId = getAnimationBySamplerId( samplerId );
 
-		if ( !animationInfo )
+		if ( !animationUniqueId.isValid() )
 			return true;
 
 		SidAddress sidAddress( attributeData.target );
-#if 0
 		const SidTreeNode* sidTreeNode = resolveSid( sidAddress );
 
 		if ( sidTreeNode )
@@ -412,29 +259,20 @@ namespace COLLADASaxFWL
 					animationList = new COLLADAFW::AnimationList( animationListUniqueId.getObjectId() );
 				}
 
-				// TODO handle this for arrays
+				// TODO determine animation class 
 				COLLADAFW::AnimationList::AnimationBinding animationBinding;
-				animationBinding.animation = animationInfo->uniqueId;
-				animationBinding.animationClass = animationInfo->animationClass;
-				if ( animationBinding.animationClass == COLLADAFW::AnimationList::MATRIX4X4_ELEMENT )
-				{
-					animationBinding.firstIndex = sidAddress.getFirstIndex();
-					animationBinding.secondIndex = sidAddress.getSecondIndex();
-				}
-				else
-				{
-					animationBinding.firstIndex = 0;
-					animationBinding.secondIndex = 0;
-				}
+				animationBinding.animation = animationUniqueId;
+				animationBinding.animationClass = COLLADAFW::AnimationList::POSITION_XYZ;
+				animationBinding.firstIndex = 0;
+				animationBinding.secondIndex = 0;
 				animationList->getAnimationBindings().append( animationBinding );
 			}
 		}
 		else
-#endif
 		{
-			// the references element has not been parsed. Store the connection. Will be processed by FileLoader
+			// the references element has not been parsed. Store the connection. Will be precessed by FileLoader
 			// at the end of the collada file.
-			addToAnimationSidAddressBindings( *animationInfo, sidAddress );
+			addToAnimationUniqueIdSidAddressPairList( animationUniqueId, sidAddress );
 		}
 
 		return true;
@@ -453,7 +291,7 @@ namespace COLLADASaxFWL
 	{
 		SaxVirtualFunctionTest(begin__input____InputLocal(attributeData));
 
-		// we ignore inputs that don't have semantics or source
+		// we ignore inputs that don't have semantics and source
 		if ( !attributeData.semantic || !attributeData.source  )
 		{
 			return true;
@@ -482,18 +320,6 @@ namespace COLLADASaxFWL
 					// The source array has wrong type. Only reals are allowed for semantic INPUT
 					break;
 				}
-
-				COLLADAFW::AnimationList::AnimationClass animationClass = determineAnimationClass( sourceBase->getAccessor() );
-
-				if ( animationClass == COLLADAFW::AnimationList::TIME )
-				{
-					mCurrentAnimationCurve->setInPhysicalDimension( COLLADAFW::PHYSICAL_DIMENSION_TIME );
-				}
-				else
-				{
-					mCurrentAnimationCurve->setInPhysicalDimension( COLLADAFW::PHYSICAL_DIMENSION_UNKNOWN );
-				}
-
 				setRealValues( mCurrentAnimationCurve->getInputValues(), (const RealSource*)sourceBase);
 			}
 			break;
@@ -505,84 +331,10 @@ namespace COLLADASaxFWL
 					break;
 				}
 
-				assert( mCurrentAnimationInfo );
-				COLLADAFW::PhysicalDimensionArray& physicalDimensions = mCurrentAnimationCurve->getOutPhysicalDimensions();
-				
-				if ( mCurrentAnimationInfo )
-				{
-					COLLADAFW::AnimationList::AnimationClass animationClass = determineAnimationClass( sourceBase->getAccessor() );
-					mCurrentAnimationInfo->animationClass = animationClass;
-
-					switch ( animationClass )
-					{
-					case COLLADAFW::AnimationList::POSITION_X:
-					case COLLADAFW::AnimationList::POSITION_Y:
-					case COLLADAFW::AnimationList::POSITION_Z:
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_LENGTH);
-						break;
-					case COLLADAFW::AnimationList::POSITION_XYZ:
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_LENGTH);
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_LENGTH);
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_LENGTH);
-						break;
-					case COLLADAFW::AnimationList::ANGLE:
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_ANGLE);
-						break;
-					case COLLADAFW::AnimationList::AXISANGLE:
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_NUMBER);
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_NUMBER);
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_NUMBER);
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_ANGLE);
-						break;
-					case COLLADAFW::AnimationList::MATRIX4X4:
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_NUMBER);
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_NUMBER);
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_NUMBER);
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_LENGTH);
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_NUMBER);
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_NUMBER);
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_NUMBER);
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_LENGTH);
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_NUMBER);
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_NUMBER);
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_NUMBER);
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_LENGTH);
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_NUMBER);
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_NUMBER);
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_NUMBER);
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_NUMBER);
-						break;
-					case COLLADAFW::AnimationList::COLOR_R:
-					case COLLADAFW::AnimationList::COLOR_G:
-					case COLLADAFW::AnimationList::COLOR_B:
-					case COLLADAFW::AnimationList::COLOR_A:
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_COLOR);
-						break;
-					case COLLADAFW::AnimationList::COLOR_RGB:
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_COLOR);
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_COLOR);
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_COLOR);
-						break;
-					case COLLADAFW::AnimationList::COLOR_RGBA:
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_COLOR);
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_COLOR);
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_COLOR);
-						physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_COLOR);
-						break;
-					}
-				}
-
 				const RealSource* realSource = (const RealSource*)sourceBase;
 				setRealValues( mCurrentAnimationCurve->getOutputValues(), realSource);
 
-				size_t stride = (size_t)realSource->getStride();
-				size_t physicalDimensionsCount = physicalDimensions.getCount();
-				// if stride is larger that physicalDimensionsCount, we need to append dimensions to physicalDimensions
-				for ( size_t i =  physicalDimensionsCount; i < stride; ++i)
-				{
-					physicalDimensions.append(COLLADAFW::PHYSICAL_DIMENSION_UNKNOWN);
-				}
-				mCurrentAnimationCurve->setOutDimension(stride);
+				mCurrentAnimationCurve->setOutDimension((size_t)realSource->getStride());
 			}
 			break;
 		case SEMANTIC_OUT_TANGENT:

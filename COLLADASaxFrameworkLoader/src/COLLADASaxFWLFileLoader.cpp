@@ -130,10 +130,9 @@ namespace COLLADASaxFWL
 	}
 
 	//-----------------------------
-	void FileLoader::addToAnimationSidAddressBindings( const AnimationInfo& animationInfo, const SidAddress& targetSidAddress )
+	void FileLoader::addToAnimationUniqueIdSidAddressPairList( const COLLADAFW::UniqueId& animationUniqueId, const SidAddress& targetSidAddress )
 	{
-		AnimationSidAddressBinding binding( animationInfo, targetSidAddress);
-		mAnimationSidAddressBindings.push_back(binding);
+		mAnimationUniqueIdSidAddressPairs.push_back(std::make_pair(animationUniqueId, targetSidAddress));
 	}
 
 	COLLADAFW::AnimationList*& FileLoader::getAnimationListByUniqueId( const COLLADAFW::UniqueId& animationListUniqueId )
@@ -150,60 +149,6 @@ namespace COLLADASaxFWL
 			writer()->writeVisualScene(visualScene);
 			FW_DELETE visualScene;
 		}
-	}
-
-	//-----------------------------
-	void FileLoader::createMissingAnimationLists()
-	{
-		AnimationSidAddressBindingList::const_iterator it = mAnimationSidAddressBindings.begin();
-		for ( ; it != mAnimationSidAddressBindings.end(); ++it )
-		{
-			const AnimationSidAddressBinding& binding = *it;
-			createMissingAnimationList( binding );
-
-		}
-	}
-
-	//-----------------------------
-	void FileLoader::createMissingAnimationList( const AnimationSidAddressBinding& binding )
-	{
-		const SidTreeNode* sidTreeNode = resolveSid( binding.sidAddress);
-		if ( sidTreeNode )
-		{
-			if ( sidTreeNode->getTargetType() == SidTreeNode::TARGETTYPE_ANIMATABLE )
-			{
-				COLLADAFW::Animatable* animatable = sidTreeNode->getAnimatableTarget();
-				COLLADAFW::UniqueId animationListUniqueId = animatable->getAnimationList();
-				if ( !animationListUniqueId.isValid() )
-				{
-					animationListUniqueId = getUniqueId( COLLADAFW::AnimationList::ID() );
-					animatable->setAnimationList( animationListUniqueId );
-				}
-				COLLADAFW::AnimationList*& animationList = getAnimationListByUniqueId(animationListUniqueId);
-
-				if ( !animationList )
-				{
-					animationList = new COLLADAFW::AnimationList( animationListUniqueId.getObjectId() );
-				}
-
-				// TODO handle this for arrays
-				COLLADAFW::AnimationList::AnimationBinding animationBinding;
-				animationBinding.animation = binding.animationInfo.uniqueId;
-				animationBinding.animationClass = binding.animationInfo.animationClass;
-				if ( animationBinding.animationClass == COLLADAFW::AnimationList::MATRIX4X4_ELEMENT )
-				{
-					animationBinding.firstIndex = binding.sidAddress.getFirstIndex();
-					animationBinding.secondIndex = binding.sidAddress.getSecondIndex();
-				}
-				else
-				{
-					animationBinding.firstIndex = 0;
-					animationBinding.secondIndex = 0;
-				}
-				animationList->getAnimationBindings().append( animationBinding );
-			}
-		}
-
 	}
 
 	//-----------------------------
@@ -358,7 +303,6 @@ namespace COLLADASaxFWL
     bool FileLoader::end__COLLADA()
     {
 		SaxVirtualFunctionTest(end__COLLADA());
-		createMissingAnimationLists();
 		writeAndDeleteVisualScenes();
 		writeAndDeleteAnimationLists();
         writer()->finish();
