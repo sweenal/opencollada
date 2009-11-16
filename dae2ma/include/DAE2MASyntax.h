@@ -21,9 +21,7 @@
 
 namespace DAE2MA
 {
-    /** The default maya version. */
-    static const char* MAYA_VERSION_DEFAULT                         = "2009";
-
+    
     /** Profile specific extra attribute parameters. */
     static const char* PROFILE_MAYA                                 = "OpenCOLLADAMaya";
 

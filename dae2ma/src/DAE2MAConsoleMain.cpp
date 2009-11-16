@@ -73,7 +73,7 @@ bool checkFileName ( std::string &mayaAsciiFileName )
 
 /**
  * Usage on import:
- * COLLADAMaya -i [infile.dae] [outfile.ma] -v [Maya version (default is 2009)]
+ * COLLADAMaya -i [infile.dae] [outfile.ma]
  */
 #ifdef COLLADABU_OS_WIN
 int main(int argc,char** argv)
@@ -101,12 +101,10 @@ int main(int argc,char** argv)
 
     char inFileName[MAX_FILENAME_LEN]={0};
     char outFileName[MAX_FILENAME_LEN]={0};
-    char mayaVersion[6];
 
     // Save the number of arguments 
     int inFileArgPos = 0;
     int outFileArgPos = 0;
-    int mayaVersionArgPos = 0;
 
     if ( argc > 1 )
     {
@@ -118,21 +116,7 @@ int main(int argc,char** argv)
         {
             // Check for an input and an output filename
             if ( argc > 2 ) inFileArgPos = 2;
-            if ( argc > 3 ) 
-            {
-                stream.clear ();
-                stream << argv[3];
-                if ( !COLLADABU::Utils::equals ( stream.str (), "-v" ) )
-                    outFileArgPos = 3;
-                else if ( argc > 4 ) mayaVersionArgPos = 4;
-            }
-            if ( argc > 4 )
-            {
-                stream.clear ();
-                stream << argv[4];
-                if ( COLLADABU::Utils::equals ( stream.str (), "-v" ) )
-                    mayaVersionArgPos = 5;
-            }
+            if ( argc > 3 ) outFileArgPos = 3;
         }
     }
 
@@ -140,27 +124,21 @@ int main(int argc,char** argv)
     bool hasOutFileName = false;
 
     // both an inputfile and outputfile specified as command line args
-    if ( inFileArgPos > 0 && outFileArgPos > 0 )
+    if ( inFileArgPos == 2 && outFileArgPos == 3 )
     {
 	    strcpy ( inFileName, argv[inFileArgPos] );
 	    strcpy ( outFileName, argv[outFileArgPos] );
         hasOutFileName = true;
-        if ( mayaVersionArgPos > 0 )
-            strcpy ( mayaVersion, argv[mayaVersionArgPos] );
-		else strcpy ( mayaVersion, DAE2MA::MAYA_VERSION_DEFAULT);
     }
     // Just a input file
-    else if ( inFileArgPos > 0 )
+    else if ( inFileArgPos == 2 )
     {
 	    // got infile from command line args
 	    strcpy ( inFileName, argv[inFileArgPos] );
-        if ( mayaVersionArgPos > 0 )
-            strcpy ( mayaVersion, argv[mayaVersionArgPos] );
-		else strcpy ( mayaVersion, DAE2MA::MAYA_VERSION_DEFAULT);
     }
     else 
     {
-        std::cerr << "[ERROR] Usage on import:\n\tCOLLADAMaya -i [infile.dae] [outfile.dae] -v [Maya version (default is 2009)]\n";
+        std::cerr << "[ERROR] Usage on import:\n\tCOLLADAMaya -i [infile.dae] [outfile.dae]\n";
 #ifdef _DEBUG
         getchar();
 #endif
@@ -218,7 +196,7 @@ int main(int argc,char** argv)
     }
 
     // Actually import the document
-    DAE2MA::DocumentImporter documentImporter ( inFileName, mayaAsciiFileName, mayaVersion );
+    DAE2MA::DocumentImporter documentImporter ( inFileName, mayaAsciiFileName );
     documentImporter.importCurrentScene ();
 
     // Display some closing information.
