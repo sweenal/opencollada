@@ -1,6 +1,4 @@
 #summary Source
-
-= GitHub =
-
+=GitHub=
 The sources are now available on [https://github.com/khronosGroup/OpenCOLLADA GitHub].
 Open bugs and issues will be transferred to GitHub until August 2012.
