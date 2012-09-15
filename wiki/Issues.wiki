@@ -1,1 +1,2 @@
+=Issues=
 Please report new issues on [https://github.com/KhronosGroup/OpenCOLLADA/issues/ GitHub]
